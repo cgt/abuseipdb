@@ -28,42 +28,42 @@ type Category int16
 
 const (
 	// Fraudulent orders.
-	FraudOrder Category = 3
+	CategoryFraudOrder Category = 3
 	// Participating in distributed denial-of-service (usually part of botnet).
-	DDoSAttack Category = 4
+	CategoryDDoSAttack Category = 4
 	// Open proxy, open relay, or Tor exit node.
-	OpenProxy Category = 9
+	CategoryOpenProxy Category = 9
 	// Comment/forum spam, HTTP referer spam, or other CMS spam.
-	WebSpam Category = 10
+	CategoryWebSpam Category = 10
 	// Spam email content, infected attachments, phishing emails, and spoofed
 	// senders (typically via exploited host or SMTP server abuse).
 	// Note: Limit comments to only relevent information (instead of log dumps)
 	// and be sure to remove PII if you want to remain anonymous.
-	EmailSpam Category = 11
+	CategoryEmailSpam Category = 11
 	// Scanning for open ports and vulnerable services.
-	PortScan Category = 14
+	CategoryPortScan Category = 14
 	// Credential brute-force attacks on webpage logins and services like SSH,
 	// FTP, SIP, SMTP, RDP, etc. This category is seperate from DDoS attacks.
-	BruteForce Category = 18
+	CategoryBruteForce Category = 18
 	// Webpage scraping (for email addresses, content, etc) and crawlers that
 	// do not honor robots.txt.
 	// Excessive requests and user agent spoofing can also be reported here.
-	BadWebBot Category = 19
+	CategoryBadWebBot Category = 19
 	// Host is likely infected with malware and being used for other attacks or
 	// to host malicious content.
 	// The host owner may not be aware of the compromise.
 	// This category is often used in combination with other attack categories.
-	ExploitedHost Category = 20
+	CategoryExploitedHost Category = 20
 	// Attempts to probe for or exploit installed web applications such as a CMS
 	// like WordPress/Drupal, e-commerce solutions, forum software, phpMyAdmin
 	// and various other software plugins/solutions.
-	WebAppAttack Category = 21
+	CategoryWebAppAttack Category = 21
 	// Secure Shell (SSH) abuse.
 	// Use this category in combination with more specific categories.
-	SSH Category = 22
+	CategorySSH Category = 22
 	// Abuse was targeted at an "Internet of Things" type device.
 	// Include information about what type of device was targeted in the comments.
-	IoTTargeted Category = 23
+	CategoryIoTTargeted Category = 23
 )
 
 // Report is an AbuseIPDB report of an IP address.
