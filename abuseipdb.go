@@ -16,9 +16,7 @@ import (
 	"time"
 )
 
-const (
-	baseURL = "https://www.abuseipdb.com/"
-)
+var baseURL = "https://www.abuseipdb.com/"
 
 var DefaultUserAgent = "go-abuseipdb-client/1.0 (+https://cgt.name/pkg/abuseipdb)"
 
@@ -183,7 +181,7 @@ type reportResponseOK struct {
 	Success bool   `json:"success"`
 }
 
-// UnknownResponseError represents an unknown HTTP response from the API.
+// UnknownResponseError represents an unknown response from the API.
 type UnknownResponseError struct {
 	StatusCode int
 	Status     string
