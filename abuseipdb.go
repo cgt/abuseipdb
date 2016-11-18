@@ -81,6 +81,15 @@ type Report struct {
 	Comment    string     `json:"comment,omitempty"`
 }
 
+// NewReport creates a new Report with the data required for submission.
+func NewReport(ip string, categories []Category, comment string) Report {
+	return Report{
+		IP:         ip,
+		Categories: categories,
+		Comment:    comment,
+	}
+}
+
 // UnmarshalJSON implements the json.Unmarshaler inteface.
 // A custom implementation is necessary because the standard Unmarshaler for
 // time.Time expects RFC3339 format and the AbuseIPDB API uses RFC1123Z format.
