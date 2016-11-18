@@ -77,6 +77,39 @@ type Report struct {
 	Comment    string
 }
 
+// UnmarshalJSON implements the json.Unmarshaler inteface.
+// A custom implementation is necessary because the standard Unmarshaler for
+// time.Time expects RFC3339 format and the AbuseIPDB API uses RFC1123Z format.
+func (r *Report) UnmarshalJSON(b []byte) error {
+	type report struct {
+		IP         string     `json:"ip"`
+		Categories []Category `json:"category"`
+		Country    *string    `json:"country"`
+		ISOCode    *string    `json:"isoCode"`
+		Created    string     `json:"created"`
+		Comment    string
+	}
+	var rep report
+	err := json.Unmarshal(b, &rep)
+	if err != nil {
+		return err
+	}
+
+	r.IP = rep.IP
+	r.Categories = rep.Categories
+	r.Country = rep.Country
+	r.ISOCode = rep.ISOCode
+	r.Comment = rep.Comment
+
+	t, err := time.Parse(time.RFC1123Z, rep.Created)
+	if err != nil {
+		return err
+	}
+	r.Created = t
+
+	return nil
+}
+
 // Client is an AbuseIPDB client.
 type Client struct {
 	APIKey string
@@ -193,8 +226,41 @@ func (c Client) CheckDays(ip string, days int) ([]Report, error) {
 	}
 	defer resp.Body.Close()
 
-	// TODO: Finish
-	// Remember: API may return single object or array of objects.
+	var buf bytes.Buffer
+	_, err = io.Copy(&buf, resp.Body)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	// Figure out what the type of the JSON root is (array or object),
+	// so that we can unmarshal it correctly into either []Report or Report.
+	// typ=0: default value (error!)
+	// typ=1: array
+	// typ=2: object
+	var typ int
+	for _, b := range buf.Bytes() {
+		if b == '[' {
+			typ = 1
+			break
+		} else if b == '{' {
+			typ = 2
+			break
+		}
+	}
+	if typ == 0 {
+		return nil, fmt.Errorf("JSON root isn't an object or an array: %s", buf.String())
+	}
+
+	var (
+		reports []Report
+		dec     = json.NewDecoder(&buf)
+	)
+	if typ == 1 {
+		err = dec.Decode(&reports)
+	} else {
+		var r Report
+		err = dec.Decode(&r)
+		reports = append(reports, r)
+	}
+	return reports, err
 }
