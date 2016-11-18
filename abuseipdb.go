@@ -1,4 +1,4 @@
-// Package abuseipdb provides a client for the AbuseIPDB service.
+// Package abuseipdb provides a client for the AbuseIPDB API.
 // See https://www.abuseipdb.com.
 package abuseipdb // import "cgt.name/pkg/abuseipdb"
 
