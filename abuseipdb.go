@@ -67,7 +67,11 @@ const (
 )
 
 // Report is an AbuseIPDB report of an IP address.
-// TODO: Explain used for both submitting and querying.
+// Report is used both for submitting and receiving reports,
+// but not all fields are used in both cases.
+// Country, ISOCode, and Created are only used when receiving reports.
+// Comment is only used when submitting reports.
+// Other fields are always valid.
 type Report struct {
 	IP         string     `json:"ip"`
 	Categories []Category `json:"category"`
