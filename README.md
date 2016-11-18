@@ -4,6 +4,7 @@
 
 Package abuseipdb provides a client for the AbuseIPDB API.
 It is required to have an API key to use the API.
+
 See https://www.abuseipdb.com/api.html.
 
 ## Installation
