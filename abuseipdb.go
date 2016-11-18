@@ -75,10 +75,10 @@ const (
 type Report struct {
 	IP         string     `json:"ip"`
 	Categories []Category `json:"category"`
-	Country    *string    `json:"country"`
-	ISOCode    *string    `json:"isoCode"`
-	Created    time.Time  `json:"created"`
-	Comment    string
+	Country    string     `json:"country,omitempty"`
+	ISOCode    string     `json:"isoCode,omitempty"`
+	Created    time.Time  `json:"created,omitempty"`
+	Comment    string     `json:"comment,omitempty"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler inteface.
@@ -101,9 +101,14 @@ func (r *Report) UnmarshalJSON(b []byte) error {
 
 	r.IP = rep.IP
 	r.Categories = rep.Categories
-	r.Country = rep.Country
-	r.ISOCode = rep.ISOCode
 	r.Comment = rep.Comment
+
+	if rep.Country != nil {
+		r.Country = *rep.Country
+	}
+	if rep.ISOCode != nil {
+		r.ISOCode = *rep.ISOCode
+	}
 
 	t, err := time.Parse(time.RFC1123Z, rep.Created)
 	if err != nil {

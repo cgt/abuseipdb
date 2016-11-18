@@ -8,10 +8,6 @@ import (
 	"time"
 )
 
-func strptr(s string) *string {
-	return &s
-}
-
 func TestCheckOneReport(t *testing.T) {
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -43,8 +39,8 @@ func TestCheckOneReport(t *testing.T) {
 
 	expected := Report{
 		IP:         "127.0.0.2",
-		Country:    strptr("Turkey"),
-		ISOCode:    strptr("TR"),
+		Country:    "Turkey",
+		ISOCode:    "TR",
 		Categories: []Category{5, 15},
 		Created:    time.Date(2016, 11, 18, 17, 4, 2, 0, time.UTC),
 	}
@@ -97,8 +93,8 @@ func TestCheckMultipleReports(t *testing.T) {
 	}
 
 	r := reports[0]
-	if r.ISOCode != nil {
-		t.Error("expected ISOCode nil, got %v", r.ISOCode)
+	if r.ISOCode != "" {
+		t.Error("expected empty ISOCode, got %v", r.ISOCode)
 	}
 	if len(r.Categories) != 2 {
 		t.Error("expected len(Categories) == 2, got %d", len(r.Categories))
