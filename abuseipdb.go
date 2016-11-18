@@ -26,6 +26,8 @@ var DefaultUserAgent = "go-abuseipdb-client/1.0 (+https://cgt.name/pkg/abuseipdb
 // See https://www.abuseipdb.com/categories
 type Category int16
 
+//go:generate stringer -type=Category
+
 const (
 	// Fraudulent orders.
 	FraudOrder Category = 3
