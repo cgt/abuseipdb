@@ -128,13 +128,24 @@ func (r *Report) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Client is an AbuseIPDB client.
+// Client is an AbuseIPDB client. Use NewClient() to instantiate.
 type Client struct {
+	http   *http.Client
 	APIKey string
 }
 
+// NewClient initializes a new Client.
+func NewClient(apiKey string) *Client {
+	return &Client{
+		http: &http.Client{
+			Timeout: 30 * time.Second,
+		},
+		APIKey: apiKey,
+	}
+}
+
 // Report submits a report to AbuseIPDB.
-func (c Client) Report(r Report) error {
+func (c *Client) Report(r Report) error {
 	if ip := net.ParseIP(r.IP); ip == nil {
 		return errors.New("invalid Report.IPAddress: invalid IP")
 	}
@@ -167,7 +178,7 @@ func (c Client) Report(r Report) error {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.http.Do(req)
 	if err != nil {
 		return err
 	}
@@ -212,7 +223,7 @@ func (e UnknownResponseError) Error() string {
 
 // Check queries AbuseIPDB for reports of an IP address.
 // Check uses the default days limit chosen by the API.
-func (c Client) Check(ip string) ([]Report, error) {
+func (c *Client) Check(ip string) ([]Report, error) {
 	return c.CheckDays(ip, 0)
 }
 
@@ -220,7 +231,7 @@ func (c Client) Check(ip string) ([]Report, error) {
 // If days is less than 1, the parameter will be not be sent
 // and the default value chosen by the API is used.
 // If using the default value, use method Check instead.
-func (c Client) CheckDays(ip string, days int) ([]Report, error) {
+func (c *Client) CheckDays(ip string, days int) ([]Report, error) {
 	if ip := net.ParseIP(ip); ip == nil {
 		return nil, errors.New("invalid Report.IPAddress: invalid IP")
 	}
@@ -238,7 +249,7 @@ func (c Client) CheckDays(ip string, days int) ([]Report, error) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.http.Do(req)
 	if err != nil {
 		return nil, err
 	}

@@ -28,7 +28,7 @@ func TestCheckOneReport(t *testing.T) {
 	defer s.Close()
 	baseURL = s.URL
 
-	c := Client{"testapikey"}
+	c := NewClient("testapikey")
 	reports, err := c.Check("127.0.0.2")
 	if err != nil {
 		t.Fatal(err)
@@ -83,7 +83,7 @@ func TestCheckMultipleReports(t *testing.T) {
 	defer s.Close()
 	baseURL = s.URL
 
-	c := Client{"testapikey"}
+	c := NewClient("testapikey")
 	reports, err := c.Check("127.0.0.9")
 	if err != nil {
 		t.Fatal(err)
