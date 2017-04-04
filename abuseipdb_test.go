@@ -94,10 +94,10 @@ func TestCheckMultipleReports(t *testing.T) {
 
 	r := reports[0]
 	if r.ISOCode != "" {
-		t.Error("expected empty ISOCode, got %v", r.ISOCode)
+		t.Errorf("expected empty ISOCode, got %v", r.ISOCode)
 	}
 	if len(r.Categories) != 2 {
-		t.Error("expected len(Categories) == 2, got %d", len(r.Categories))
+		t.Errorf("expected len(Categories) == 2, got %d", len(r.Categories))
 	}
 	// Just check two fields. If they are OK, the rest are probably OK too.
 }
