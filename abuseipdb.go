@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -184,41 +185,35 @@ func (c *Client) Report(r Report) error {
 	}
 	defer resp.Body.Close()
 
-	// Read response into buffer.
-	// This lets us keep the raw response if the unmarshaling should fail,
-	// so we can return it to the caller.
-	// The API docs aren't really clear on what responses are returned when.
-	buf.Reset()
-	_, err = io.Copy(&buf, resp.Body)
+	if resp.StatusCode >= 400 && resp.StatusCode < 600 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return RequestError{resp.Status, body}
+	}
+
+	var ok struct {
+		IP      string `json:"ip"`
+		Success bool   `json:"success"`
+	}
+	err = json.NewDecoder(resp.Body).Decode(&ok)
 	if err != nil {
 		return err
 	}
-	var ok reportResponseOK
-	err = json.Unmarshal(buf.Bytes(), &ok)
-	if err != nil {
-		return UnknownResponseError{resp.StatusCode, resp.Status, buf.Bytes()}
-	}
-
 	if !ok.Success {
 		return errors.New("API reports 'success'=false")
 	}
 	return nil
 }
 
-type reportResponseOK struct {
-	IP      string `json:"ip"`
-	Success bool   `json:"success"`
-}
-
-// UnknownResponseError represents an unknown response from the API.
-type UnknownResponseError struct {
-	StatusCode int
-	Status     string
+type RequestError struct {
+	HTTPStatus string
 	Body       []byte
 }
 
-func (e UnknownResponseError) Error() string {
-	return fmt.Sprintf("status code %d, unknown response %s", e.StatusCode, e.Body)
+func (e RequestError) Error() string {
+	return fmt.Sprintf("API request failure: %s. Body: %s", e.HTTPStatus, e.Body)
 }
 
 // Check queries AbuseIPDB for reports of an IP address.
@@ -254,6 +249,14 @@ func (c *Client) CheckDays(ip string, days int) ([]Report, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 && resp.StatusCode < 600 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		return nil, RequestError{resp.Status, body}
+	}
 
 	var buf bytes.Buffer
 	_, err = io.Copy(&buf, resp.Body)
